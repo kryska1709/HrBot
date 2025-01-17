@@ -22,30 +22,30 @@ public class HrTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
-            // Обработать сообщение
+
             switch (messageText) {
                 case "/start":
-                    sendResponse(update.getMessage().getChatId(), "Добро пожаловать в HRBot!");
+                    sendResponse(update.getMessage().getChatId(), "Добро пожаловать! Я Ваш HR-бот.");
                     break;
                 case "/help":
-                    sendResponse(update.getMessage().getChatId(), "Как я могу помочь вам?");
+                    sendResponse(update.getMessage().getChatId(), "Команды: /start - начать, /help - помощь.");
                     break;
                 default:
-                    sendResponse(update.getMessage().getChatId(), "Неизвестная команда. Попробуйте /help.");
+                    sendResponse(update.getMessage().getChatId(), "Вы написали: " + messageText);
                     break;
             }
         }
     }
 
+    // Метод для отправки ответа
     private void sendResponse(Long chatId, String text) {
-        // Создаем объект SendMessage
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
         try {
-            execute(message); // Отправляем сообщение
+            execute(message); // Отправка сообщения
         } catch (TelegramApiException e) {
-            e.printStackTrace(); // Обработка исключений
+            e.printStackTrace();
         }
     }
 }
