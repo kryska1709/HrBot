@@ -1,6 +1,9 @@
 package dev.madela.hr_bot;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage; // ... существующий код ...
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -38,7 +41,7 @@ public class HrTelegramBot extends TelegramLongPollingBot {
     }
 
     // Метод для отправки ответа
-    private void sendResponse(Long chatId, String text) {
+    public void sendResponse(Long chatId, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
         message.setText(text);
@@ -47,5 +50,23 @@ public class HrTelegramBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+}
+
+// Новый контроллер для обработки запросов
+@RestController
+class BotController {
+
+    private final HrTelegramBot hrTelegramBot;
+
+    @Autowired
+    public BotController(HrTelegramBot hrTelegramBot) {
+        this.hrTelegramBot = hrTelegramBot;
+    }
+
+    @GetMapping("/sendMessage")
+    public String sendMessage(Long chatId, String text) {
+        hrTelegramBot.sendResponse(chatId, text);
+        return "Сообщение отправлено!";
     }
 }
