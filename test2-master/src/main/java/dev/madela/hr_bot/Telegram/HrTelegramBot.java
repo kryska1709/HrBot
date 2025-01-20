@@ -2,7 +2,7 @@ package dev.madela.hr_bot.Telegram;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage; // ... существующий код ...
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -22,7 +22,11 @@ public class HrTelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
-            long chatId=update.getMessage().getChatId();
+            long chatId = update.getMessage().getChatId();
+
+            // Логирование chatId
+            System.out.println("Chat ID: " + chatId);
+
             switch (messageText) {
                 case "/start":
                     StartCommandRecieved(chatId, update.getMessage().getChat().getFirstName());
@@ -31,18 +35,22 @@ public class HrTelegramBot extends TelegramLongPollingBot {
                     HelpCommandRecieved(chatId, update.getMessage().getChat().getFirstName());
                     break;
                 default:
-                    sendMessage(chatId,"такой команды нет");
+                    sendMessage(chatId, "такой команды нет");
             }
         }
     }
-    private void StartCommandRecieved(long chatId, String name){
-    String answer = "Здравствуйте, " + name + ", Я HRBot!";
-    sendMessage(chatId,answer);
+
+
+    private void StartCommandRecieved(long chatId, String name) {
+        String answer = "Здравствуйте, " + name + ", Я HRBot!";
+        sendMessage(chatId, answer);
     }
-    private void HelpCommandRecieved(long chatId, String name){
+
+    private void HelpCommandRecieved(long chatId, String name) {
         String answer = "Команды: /start - начать, /help - помощь.";
-        sendMessage(chatId,answer);
+        sendMessage(chatId, answer);
     }
+
     public void sendMessage(long chatId, String textToSend) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
@@ -50,6 +58,14 @@ public class HrTelegramBot extends TelegramLongPollingBot {
         try {
             execute(message);
         } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
+    }
+
+    public void sendNotification(String chatId, String message) throws TelegramApiException {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText(message);
+        execute(sendMessage);
     }
 }
